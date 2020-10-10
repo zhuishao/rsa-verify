@@ -1,12 +1,31 @@
 {
   "name": "rsa-verify",
-  "version": "0.1.0",
-  "private": true,
+  "version": "0.1.1",
+  "description": "在vue中使用的滑块人机校验，附带rsa加密功能，rsa公钥需要作为prop传入",
+  "main": "lib/rsa-verify.umd.min.js",
+  "directories": {
+    "example": "examples"
+  },
+  "repository": {
+    "type": "git",
+    "url": "ssh://git@10.43.200.81:22222/e2/rsa-verify.git"
+  },
+  "files": ["/lib", "README.md", "package.json"],
+  "keywords": [
+    "rsa",
+    "vue",
+    "verify",
+    "人机交互",
+    "人机校验",
+    "拼图",
+    "滑块"
+  ],
+  "private": false,
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build --report",
     "lint": "vue-cli-service lint",
-    "lib": "vue-cli-service build --target lib --name ecarx-aq-rj --dest lib --entry packages/index.js"
+    "lib": "vue-cli-service build --target lib --name rsa-verify --dest lib --entry packages/index.js"
   },
   "dependencies": {
     "core-js": "^3.6.5",
@@ -44,5 +63,7 @@
     "> 1%",
     "last 2 versions",
     "not dead"
-  ]
+  ],
+  "author": "zhuishao",
+  "license": "MIT"
 }
