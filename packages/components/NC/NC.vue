@@ -41,6 +41,10 @@ import rsa from './func/rsa';
 export default {
   name: 'NC',
   props: {
+    imgPath: {
+      type: String,
+      default: '/',
+    },
     publicKey: {
       type: String,
       default: 'null',
@@ -61,7 +65,6 @@ export default {
       tipShow: true,
       // 是否正在刷新
       refreshing: false,
-      publicPath: process.env.BASE_URL,
       t: null,
     };
   },
@@ -137,6 +140,9 @@ export default {
       }, 1200);
     },
     resetRange() {
+      if (!document.getElementById('range-input')) {
+        return;
+      }
       const val = document.getElementById('range-input').value;
       if (parseInt(val, 10) > 0) {
         document.getElementById('range-input').value = parseInt(val, 10) - 6;
@@ -220,7 +226,7 @@ export default {
         }, 500);
       };
       this.imageIndex = parseInt(Math.random() * 5, 10);
-      img.src = `${this.publicPath}images/${this.imageIndex}.jpg`;
+      img.src = `${this.imgPath}images/${this.imageIndex}.jpg`;
     },
     drawImage() {
 
@@ -546,7 +552,7 @@ input[type="range"]:focus {
   }
   .tip-show::before{
     left: 7px;
-    top: 13px;
+    top: 9px;
   }
   .zh .tip-show::before {
     position: absolute;

@@ -5,7 +5,7 @@
 # 如何引入
 
 ```
-npm i rsa-verify
+npm i -S rsa-verify
 ```
 
 在main.js文件中引入
@@ -16,6 +16,17 @@ import 'rsa-verify/lib/rsa-verify.css'
 Vue.use(RsaVerify);
 ```
 
+或按需引入
+
+```
+import { NC } from 'rsa-verify'
+import 'rsa-verify/lib/rsa-verify.css'
+
+componnets:  {
+	NC,
+}
+```
+
 考虑到每个公司使用的图片不一定会相同的原因，需要在项目中的public文件中加入images文件夹，并放入5张图片，图片名称为0.jpg，1.jpg，2.jpg，3.jpg，4.jpg。图片大小必须为宽260，高160。
 
 # 如何使用
@@ -24,7 +35,7 @@ Vue.use(RsaVerify);
 <template>
   <div class="home">
     <button @click="openNC">点击测试</button>
-    <n-c :publicKey="publicKey" @onsuccess="verifySuccess" ref="nc"></n-c>
+    <n-c :imgPath="process.env.publicPath" :publicKey="publicKey" @onsuccess="verifySuccess" ref="nc"></n-c>
   </div>
 </template>
 ```
@@ -60,11 +71,12 @@ export default {
 
 ## API
 
-| 参数      | 说明                                    | 类型     | 默认值 | 版本 |
-| --------- | --------------------------------------- | -------- | ------ | ---- |
-| publicKey | rsa公钥，如不使用可不传入               | String   | ‘null’ |      |
-| locale    | 国际化，提示语可传‘zh’,'en',zh为中文，en为英文             | String   | 'zh'   |      |
-| onsuccess | @onsuccess= "()=>{}",验证成功的回调函数 | Function |        |      |
+| 参数      | 说明                                           | 类型     | 默认值 | 版本 |
+| --------- | ---------------------------------------------- | -------- | ------ | ---- |
+| publicKey | rsa公钥，如不使用可不传入                      | String   | ‘null’ |      |
+| imgPath   | 图片位置，可传配置process.env.publicPath       | String   | './'   |      |
+| locale    | 国际化，提示语可传‘zh’,'en',zh为中文，en为英文 | String   | 'zh'   |      |
+| onsuccess | @onsuccess= "()=>{}",验证成功的回调函数        | Function |        |      |
 
 加入ref=”nc“后可执行的操作
 
