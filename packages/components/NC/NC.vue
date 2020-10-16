@@ -198,14 +198,14 @@ export default {
         const imageData = context.getImageData(sx, sy, 40, 40);
         const { length } = imageData.data;
         for (let index = 0; index < length; index += 4) {
-          const r = imageData.data[index];
-          const g = imageData.data[index + 1];
-          const b = imageData.data[index + 2];
-          // 计算灰度
-          const gray = r * 0.299 + g * 0.587 + b * 0.114;
-          imageData.data[index] = gray;
-          imageData.data[index + 1] = gray;
-          imageData.data[index + 2] = gray;
+          // const r = imageData.data[index];
+          // const g = imageData.data[index + 1];
+          // const b = imageData.data[index + 2];
+          // // 计算灰度
+          // const gray = r * 0.299 + g * 0.587 + b * 0.114;
+          imageData.data[index] = 255;
+          imageData.data[index + 1] = 255;
+          imageData.data[index + 2] = 255;
         }
         // 光晕
         context.shadowColor = 'gray';

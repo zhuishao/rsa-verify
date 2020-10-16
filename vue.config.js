@@ -1,7 +1,7 @@
 module.exports = {
     pages: {
         index: {
-            entry: 'package/main.js',
+            entry: 'example/main.js',
             template: 'public/index.html',
             filename: 'index.html'
         }
