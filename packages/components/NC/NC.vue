@@ -52,6 +52,10 @@ export default {
     locale: {
       type: String,
       default: 'zh',
+    },
+    size: {
+      type: Number,
+      default: 50,
     }
   },
   data() {
@@ -162,12 +166,12 @@ export default {
         this.imageData,
         this.sx,
         this.sy,
-        40,
-        40,
+        this.size,
+        this.size,
         10,
         this.sy,
-        40,
-        40,
+        this.size,
+        this.size,
       );
     },
     show() {
@@ -191,34 +195,40 @@ export default {
         // 图片绘制
         context.drawImage(self.imageData, 0, 0, 260, 160);
         // 然后获取中间100*100区域数据
-        const sx = parseInt(Math.random() * 180, 10) + 40;
-        const sy = parseInt(Math.random() * 80, 10) + 20;
+        const sx = parseInt(Math.random() * (260 - 2* self.size - 10), 10) + self.size;
+        const sy = parseInt(Math.random() * (160 - self.size - 40), 10) + 20;
         self.sx = sx;
         self.sy = sy;
-        const imageData = context.getImageData(sx, sy, 40, 40);
+        const imageData = context.getImageData(sx, sy, self.size, self.size);
         const { length } = imageData.data;
         for (let index = 0; index < length; index += 4) {
-          // const r = imageData.data[index];
-          // const g = imageData.data[index + 1];
-          // const b = imageData.data[index + 2];
-          // // 计算灰度
-          // const gray = r * 0.299 + g * 0.587 + b * 0.114;
-          imageData.data[index] = 255;
-          imageData.data[index + 1] = 255;
-          imageData.data[index + 2] = 255;
+          const r = imageData.data[index];
+          const g = imageData.data[index + 1];
+          const b = imageData.data[index + 2];
+          // 计算灰度
+          const gray = r * 0.299 + g * 0.587 + b * 0.114;
+          if (index % 3 <2) {
+            imageData.data[index] = gray;
+            imageData.data[index + 1] = gray;
+            imageData.data[index + 2] = gray;
+          } else{
+            imageData.data[index] = 255;
+            imageData.data[index + 1] = 255;
+            imageData.data[index + 2] = 255;
+          }
         }
         // 光晕
         context.shadowColor = 'gray';
         context.shadowBlur = 4;
         // 填充个淡淡的颜色，以示尊敬
-        context.fillRect(sx, sy, 40, 40);
+        context.fillRect(sx, sy, self.size, self.size);
 
         // 更新新数据
         context.putImageData(imageData, sx, sy);
         self.canvas2 = document.getElementById('ec-canvas-thumb');
         self.context2 = self.canvas2.getContext('2d');
         self.context2.clearRect(0, 0, self.canvas2.width, self.canvas2.height);
-        self.context2.drawImage(self.imageData, sx, sy, 40, 40, 0, sy, 40, 40);
+        self.context2.drawImage(self.imageData, sx, sy, self.size, self.size, 0, sy, self.size, self.size);
         self.context2.shadowColor = 'yellow';
         self.context2.shadowBlur = 4;
         setTimeout(() => {
@@ -228,9 +238,6 @@ export default {
       this.imageIndex = parseInt(Math.random() * 5, 10);
       img.src = `${this.imgPath}images/${this.imageIndex}.jpg`;
     },
-    drawImage() {
-
-    },
     drawThumb(x) {
       const canvas = document.getElementById('ec-canvas-thumb');
       const context = canvas.getContext('2d');
@@ -239,12 +246,12 @@ export default {
         this.imageData,
         this.sx,
         this.sy,
-        40,
-        40,
+        this.size,
+        this.size,
         x,
         this.sy,
-        40,
-        40,
+        this.size,
+        this.size,
       );
     },
   },
@@ -450,6 +457,7 @@ input[type="range"]:focus {
   box-shadow: inset 0 1px 0.25em #eee;
 }
 .ec-panel {
+  font-size: 14px;
   position: relative;
 }
 .ec-panel.ec-wind {

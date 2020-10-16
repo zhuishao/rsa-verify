@@ -27,6 +27,10 @@ componnets:  {
 }
 ```
 
+# 更新@0.1.7
+1.小方块可以控制大小
+2.白色的底变为有规则的灰度白底
+
 考虑到每个公司使用的图片不一定会相同的原因，需要在项目中的public文件中加入images文件夹，并放入5张图片，图片名称为0.jpg，1.jpg，2.jpg，3.jpg，4.jpg。图片大小必须为宽260，高160。
 
 # 如何使用
@@ -71,12 +75,15 @@ export default {
 
 ## API
 
-| 参数      | 说明                                           | 类型     | 默认值 | 版本 |
-| --------- | ---------------------------------------------- | -------- | ------ | ---- |
-| publicKey | rsa公钥，如不使用可不传入                      | String   | ‘null’ |      |
-| imgPath   | 图片位置，可传配置process.env.publicPath       | String   | './'   |      |
-| locale    | 国际化，提示语可传‘zh’,'en',zh为中文，en为英文 | String   | 'zh'   |      |
-| onsuccess | @onsuccess= "()=>{}",验证成功的回调函数        | Function |        |      |
+| 参数      | 说明                                           | 类型     | 默认值 | 版本  |
+| --------- | ---------------------------------------------- | -------- | ------ | ----- |
+| publicKey | rsa公钥，如不使用可不传入                      | String   | ‘null’ |       |
+| imgPath   | 图片位置，可传配置process.env.publicPath       | String   | './'   |       |
+| locale    | 国际化，提示语可传‘zh’,'en',zh为中文，en为英文 | String   | 'zh'   |       |
+| onsuccess | @onsuccess= "()=>{}",验证成功的回调函数        | Function |        |       |
+| size      | 小方块的大小                                   | Number   | 40     | 0.1.7 |
+
+
 
 加入ref=”nc“后可执行的操作
 
