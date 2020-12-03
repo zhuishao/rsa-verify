@@ -84,6 +84,11 @@ export default {
       t: null,
     };
   },
+  computed: {
+    encodeUrl() {
+      return this.url.replace(/\/$/,'');
+    }
+  },
   created() {
     if (!window.requestAnimationFrame) {
       let lastTime = 0;
@@ -242,7 +247,7 @@ export default {
     verify() {
       return new Promise((resolve, reject) => {
         const xhr = new XMLHttpRequest();
-        xhr.open('get',`${this.url}/checkCode?key=${encodeURIComponent(this.setCode(this.username))}&code=${encodeURIComponent(this.setCode(this.thumbx))}&lang=${encodeURIComponent(this.locale)}`);
+        xhr.open('get',`${this.encodeUrl}/checkCode?key=${encodeURIComponent(this.setCode(this.username))}&code=${encodeURIComponent(this.setCode(this.thumbx))}&lang=${encodeURIComponent(this.locale)}`);
         xhr.onreadystatechange = function () {
           switch (xhr.readyState) {
             case 4:
@@ -260,7 +265,7 @@ export default {
     getImageUrl() {
       return new Promise((resolve, reject) => {
         const xhr = new XMLHttpRequest();
-        xhr.open('get',`${this.url}/generateCode?key=${encodeURIComponent(this.setCode(this.username))}`);
+        xhr.open('get',`${this.encodeUrl}/generateCode?key=${encodeURIComponent(this.setCode(this.username))}`);
         xhr.onreadystatechange = function () {
           switch (xhr.readyState) {
             case 4:
