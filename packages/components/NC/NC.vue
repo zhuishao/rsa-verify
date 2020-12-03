@@ -1,5 +1,5 @@
 <template>
-  <div :class="['ec-panel', 'ec-wind', locale, visible ? 'active' : '']">
+  <div :class="['ec-panel', 'ec-wind', locale.indexOf('zh')===-1?'en':'zh', visible ? 'active' : '']">
     <div class="ec-panel-ghost" @click="show"></div>
     <div class="ec-panel-box">
       <div class="ec-wrap">
@@ -9,13 +9,15 @@
           height="160"
           id="ec-canvas-bg"
         ></canvas>
-        <canvas
-          class="ec-canvas-2"
-          width="260"
-          height="160"
-          id="ec-canvas-thumb"
-        ></canvas>
+        <img :src="src1" width="50" height="50" class="ec-image-thumb"/>
+<!--        <canvas-->
+<!--          class="ec-canvas-2"-->
+<!--          width="260"-->
+<!--          height="160"-->
+<!--          id="ec-canvas-thumb"-->
+<!--        ></canvas>-->
         <div :class="['img-loading', refreshing ? 'active' : '']"></div>
+        <div class="ec-error-tips">{{errormsg}}</div>
       </div>
       <div class="ec-panel">
         <input
@@ -24,7 +26,7 @@
           class="ec-range"
           type="range"
           min="0"
-          max="220"
+          max="209"
         />
         <div :class="['tip-show', tipShow?'active':'']"></div>
       </div>
@@ -53,6 +55,10 @@ export default {
       type: String,
       default: 'zh',
     },
+    url: {
+      type: String,
+      default: 'http://10.43.188.158:8080',
+    },
     size: {
       type: Number,
       default: 50,
@@ -63,12 +69,18 @@ export default {
       visible: false,
       imgIndex: 0,
       sx: 0,
+      thumbx: 0,
       sy: 0,
+      username: '',
       context2: null,
       canvas2: null,
       tipShow: true,
+      errormsg: '',
       // 是否正在刷新
       refreshing: false,
+      imageThumbData: null,
+      src1: null,
+      src2: null,
       t: null,
     };
   },
@@ -106,41 +118,43 @@ export default {
       this.tipShow = false;
       self.drawThumb(document.getElementById('range-input').value);
     });
-    document.querySelector('#range-input').addEventListener('change', (e) => {
-      if (Math.abs(parseInt(e.target.value, 10) - this.sx) < 4) {
-        self.showSuccess();
-        // 匹配成功
-      } else {
-        // 匹配失败
-        self.showError();
-      }
-      //
+    document.querySelector('#range-input').addEventListener('change', () => {
+      this.verify().then((req) => {
+        if (req.meta.success) {
+          self.showSuccess(req.content.data);
+        } else {
+          self.showError(req.meta.message);
+        }
+      }, err => {
+        self.showSuccess(err.error);
+      });
     });
-    this.Init();
   },
   methods: {
-    Init() {
-      this.loadImage();
-    },
     onRefresh() {
       this.loadImage();
     },
-    showError() {
-      document.querySelector('.ec-wrap').classList.add('error');
+    showError(msg) {
+      this.errormsg = msg;
+      this.$nextTick(() => {
+        document.querySelector('.ec-error-tips').classList.add('error');
+      })
       setTimeout(() => {
-        document.querySelector('.ec-wrap').classList.remove('error');
+        document.querySelector('.ec-error-tips').classList.remove('error');
         this.resetRange();
-        this.resetThumb();
+        // this.resetThumb();
       }, 1200);
+      setTimeout(() => {
+        this.onRefresh();
+      }, 1350);
     },
-    showSuccess() {
+    showSuccess(data) {
       document.querySelector('.ec-wrap').classList.add('success');
       setTimeout(() => {
         document.querySelector('.ec-wrap').classList.remove('success');
         this.show();
-        this.onRefresh();
         this.resetRange();
-        this.$emit('onsuccess');
+        this.$emit('onsuccess', data);
       }, 1200);
     },
     resetRange() {
@@ -163,7 +177,7 @@ export default {
       const context = canvas.getContext('2d');
       context.clearRect(0, 0, canvas.width, canvas.height);
       context.drawImage(
-        this.imageData,
+        this.imageThumbData,
         this.sx,
         this.sy,
         this.size,
@@ -174,7 +188,11 @@ export default {
         this.size,
       );
     },
-    show() {
+    show(username = '') {
+      this.username = username;
+      if (!this.visible) {
+        this.onRefresh();
+      }
       this.visible = !this.visible;
     },
     setCode(message) {
@@ -184,75 +202,82 @@ export default {
         return rsa.setCode(message);
       }
     },
+    setCodeObj(obj) {
+      if (Object.prototype.toString.call(obj).indexOf("Object")!==-1) {
+        Object.keys(obj).forEach(item => {
+          obj[item] = this.setCode(obj[item]);
+        })
+      }
+      return obj;
+    },
     loadImage() {
       const img = new Image();
+      const imgThumb = new Image();
       const self = this;
       this.refreshing = true;
       img.onload = (e) => {
-        self.imageData = e.target;
         const canvas = document.getElementById('ec-canvas-bg');
         const context = canvas.getContext('2d');
+        context.clearRect(0, 0, 260, 160);
         // 图片绘制
-        context.drawImage(self.imageData, 0, 0, 260, 160);
-        // 然后获取中间100*100区域数据
-        const sx = parseInt(Math.random() * (260 - 2* self.size - 10), 10) + self.size;
-        const sy = parseInt(Math.random() * (160 - self.size - 40), 10) + 20;
-        self.sx = sx;
-        self.sy = sy;
-        const imageData = context.getImageData(sx, sy, self.size, self.size);
-        const { length } = imageData.data;
-        for (let index = 0; index < length; index += 4) {
-          const r = imageData.data[index];
-          const g = imageData.data[index + 1];
-          const b = imageData.data[index + 2];
-          // 计算灰度
-          const gray = r * 0.299 + g * 0.587 + b * 0.114;
-          if (index % 3 <2) {
-            imageData.data[index] = gray;
-            imageData.data[index + 1] = gray;
-            imageData.data[index + 2] = gray;
-          } else{
-            imageData.data[index] = 255;
-            imageData.data[index + 1] = 255;
-            imageData.data[index + 2] = 255;
-          }
-        }
-        // 光晕
-        context.shadowColor = 'gray';
-        context.shadowBlur = 4;
-        // 填充个淡淡的颜色，以示尊敬
-        context.fillRect(sx, sy, self.size, self.size);
-
-        // 更新新数据
-        context.putImageData(imageData, sx, sy);
-        self.canvas2 = document.getElementById('ec-canvas-thumb');
-        self.context2 = self.canvas2.getContext('2d');
-        self.context2.clearRect(0, 0, self.canvas2.width, self.canvas2.height);
-        self.context2.drawImage(self.imageData, sx, sy, self.size, self.size, 0, sy, self.size, self.size);
-        self.context2.shadowColor = 'yellow';
-        self.context2.shadowBlur = 4;
+        context.drawImage(e.target, 0, 0, 260, 160);
         setTimeout(() => {
           self.refreshing = false;
-        }, 500);
+        }, 200);
+
       };
-      this.imageIndex = parseInt(Math.random() * 5, 10);
-      img.src = `${this.imgPath}images/${this.imageIndex}.jpg`;
+      this.getImageUrl().then((req) => {
+        const response = req.content.data;
+        this.sy = response.h;
+        // this.sx = req.x;
+        img.src = response.src2;
+        imgThumb.src = response.src1;
+        this.src1 = imgThumb.src;
+        this.src2 = img.src;
+        const style = document.querySelector('.ec-image-thumb').style;
+        style.setProperty('--sx', 0);
+        style.setProperty('--sy', response.h);
+      })
+    },
+    verify() {
+      return new Promise((resolve, reject) => {
+        const xhr = new XMLHttpRequest();
+        xhr.open('get',`${this.url}/checkCode?key=${encodeURIComponent(this.setCode(this.username))}&code=${encodeURIComponent(this.setCode(this.thumbx))}&lang=${encodeURIComponent(this.locale)}`);
+        xhr.onreadystatechange = function () {
+          switch (xhr.readyState) {
+            case 4:
+              if ((xhr.status >= 200 && xhr.status < 300) || xhr.status === 304) {
+                resolve(JSON.parse(xhr.response));
+              } else {
+                reject(JSON.parse(xhr.response));
+              }
+              break;
+          }
+        }
+        xhr.send();
+      })
+    },
+    getImageUrl() {
+      return new Promise((resolve, reject) => {
+        const xhr = new XMLHttpRequest();
+        xhr.open('get',`${this.url}/generateCode?key=${encodeURIComponent(this.setCode(this.username))}`);
+        xhr.onreadystatechange = function () {
+          switch (xhr.readyState) {
+            case 4:
+              if ((xhr.status >= 200 && xhr.status < 300) || xhr.status === 304) {
+                resolve(JSON.parse(xhr.response));
+              } else {
+                reject(false);
+              }
+              break;
+          }
+        }
+        xhr.send();
+      })
     },
     drawThumb(x) {
-      const canvas = document.getElementById('ec-canvas-thumb');
-      const context = canvas.getContext('2d');
-      context.clearRect(0, 0, canvas.width, canvas.height);
-      context.drawImage(
-        this.imageData,
-        this.sx,
-        this.sy,
-        this.size,
-        this.size,
-        x,
-        this.sy,
-        this.size,
-        this.size,
-      );
+      this.thumbx = x;
+      document.querySelector('.ec-image-thumb').style.setProperty('--sx', x);
     },
   },
   beforeDestroy() {
@@ -295,6 +320,25 @@ export default {
   background-color: rgb(222, 113, 91);
   transition: transform 0.3s;
 }
+.ec-error-tips{
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 20px;
+  width: 260px;
+  margin-left: auto;
+  margin-right: auto;
+  transform: translateY(20px);
+  color: white;
+  text-indent: 1rem;
+  background-color: rgb(222, 113, 91);
+  transition: transform 0.3s;
+}
+  .ec-error-tips.error {
+    transform: translateY(0);
+    transition: transform 0.3s;
+  }
 .zh .ec-wrap::before {
   content: "拖动滑块将悬浮图像正确拼合";
 }
@@ -499,6 +543,14 @@ input[type="range"]:focus {
   overflow: hidden;
   background-color: white;
   transition: width 0.5s ease, height 0.5s ease;
+}
+.ec-image-thumb{
+  position:absolute;
+  left: 9px;
+  top: 0;
+  --sx: 0;
+  --sy: 0;
+  transform: translate(calc(var(--sx) * 1px), calc(var(--sy) * 1px));
 }
 .ec-wrap {
   margin-top: 3.237%;
