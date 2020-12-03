@@ -131,7 +131,11 @@ export default {
           self.showError(req.meta.message);
         }
       }, err => {
-        self.showSuccess(err.error);
+        if (err.meta.message) {
+          self.showError(err.error);
+        } else {
+          self.showError('服务器错误');
+        }
       });
     });
   },
