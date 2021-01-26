@@ -2,7 +2,7 @@
     <div id="app">
         <button @click="show">click me</button>
         <button @click="changeLanguage">language</button>
-        <n-c locale="en-US" @onsuccess="handleSubmit" ref="nc"></n-c>
+        <n-c :locale="locale" @onsuccess="handleSubmit" ref="nc"></n-c>
     </div>
 </template>
 

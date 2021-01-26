@@ -296,7 +296,7 @@ export default {
 </script>
 
 <style scoped>
-  input[type='range'].ec-range {
+  .ec-range {
   margin: 3.24% 3.24% 5.39%;
   width: 93.52%;
 }
@@ -386,7 +386,7 @@ export default {
 [class*="-ms-"]:before {
   opacity: 0.15;
 }
-input[type="range"] {
+.ec-range {
   box-sizing: border-box;
   overflow: visible;
   -webkit-appearance: none;
@@ -402,7 +402,7 @@ input[type="range"] {
 
   cursor: pointer;
 }
-input[type="range"]::-webkit-slider-runnable-track {
+.ec-range::-webkit-slider-runnable-track {
   -webkit-appearance: none;
   /* because IE */
 
@@ -411,7 +411,7 @@ input[type="range"]::-webkit-slider-runnable-track {
   border-radius: 6.25em;
   background: #ddd;
 }
-input[type="range"]::-webkit-slider-thumb {
+.ec-range::-webkit-slider-thumb {
   -webkit-appearance: none;
   /* weird shit, Chrome */
 
@@ -427,14 +427,14 @@ input[type="range"]::-webkit-slider-thumb {
   background-size: 393.93939%;
   background-position: 0 7.5292%;
 }
-input[type="range"]:active::-webkit-slider-thumb {
+.ec-range:active::-webkit-slider-thumb {
   -webkit-appearance: none;
   /* weird shit, Chrome */
   background-image: url(images/sprite.1.0.0.png);
   background-size: 393.93939%;
   background-position: 0 20.8%;
 }
-input[type="range"]::-moz-range-track {
+.ec-range::-moz-range-track {
   /* fix Firefox WTF */
 
   z-index: -1;
@@ -446,7 +446,7 @@ input[type="range"]::-moz-range-track {
   border-radius: 6.25em;
   background: #ddd;
 }
-input[type="range"]::-moz-range-thumb {
+.ec-range::-moz-range-thumb {
   -webkit-appearance: none;
   /* weird shit, Chrome */
 
@@ -462,12 +462,12 @@ input[type="range"]::-moz-range-thumb {
   background-size: 393.93939%;
   background-position: 0 7.5292%;
 }
-input[type="range"]:active::-moz-range-thumb {
+.ec-range:active::-moz-range-thumb {
   background-image: url(images/sprite.1.0.0.png);
   background-size: 393.93939%;
   background-position: 0 20.8%;
 }
-input[type="range"]::-ms-track {
+.ec-range::-ms-track {
   /* because IE */
 
   border: none;
@@ -477,7 +477,7 @@ input[type="range"]::-ms-track {
   background: #ddd;
   color: transparent;
 }
-input[type="range"]::-ms-thumb {
+.ec-range::-ms-thumb {
   -webkit-appearance: none;
   /* weird shit, Chrome */
 
@@ -493,19 +493,19 @@ input[type="range"]::-ms-thumb {
   background-size: 393.93939%;
   background-position: 0 7.5292%;
 }
-input[type="range"]:active::-ms-thumb {
+.ec-range:active::-ms-thumb {
   background-image: url(images/sprite.1.0.0.png);
   background-size: 393.93939%;
   background-position: 0 20.8%;
 }
-input[type="range"]::-ms-fill-lower,
-input[type="range"]::-ms-fill-upper {
+.ec-range::-ms-fill-lower,
+.ec-range::-ms-fill-upper {
   background: transparent;
 }
-input[type="range"]::-ms-tooltip {
+.ec-range::-ms-tooltip {
   display: none;
 }
-input[type="range"]:focus {
+.ec-range:focus {
   outline: none;
   box-shadow: inset 0 1px 0.25em #eee;
 }
