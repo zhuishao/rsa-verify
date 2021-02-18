@@ -1,38 +1,40 @@
 <template>
-  <div :class="['ec-panel', 'ec-wind', locale.indexOf('zh')===-1?'en':'zh', visible ? 'active' : '']">
-    <div class="ec-panel-ghost" @click="show"></div>
-    <div class="ec-panel-box">
-      <div class="ec-wrap">
-        <canvas
-          class="ec-canvas"
-          width="260"
-          height="160"
-          id="ec-canvas-bg"
-        ></canvas>
-        <img :src="src1" width="50" height="50" class="ec-image-thumb"/>
-<!--        <canvas-->
-<!--          class="ec-canvas-2"-->
-<!--          width="260"-->
-<!--          height="160"-->
-<!--          id="ec-canvas-thumb"-->
-<!--        ></canvas>-->
-        <div :class="['img-loading', refreshing ? 'active' : '']"></div>
-        <div class="ec-error-tips">{{errormsg}}</div>
-      </div>
-      <div class="ec-panel">
-        <input
-          value="0"
-          id="range-input"
-          class="ec-range"
-          type="range"
-          min="0"
-          max="209"
-        />
-        <div :class="['tip-show', tipShow?'active':'']"></div>
-      </div>
-      <div class="ec-panel-footer">
-        <div class="ec-icon-close" @click="show"></div>
-        <div class="ec-icon-refresh" @click="onRefresh"></div>
+  <div class="shadow-dom">
+    <div :class="['ec-panel', 'ec-wind', locale.indexOf('zh')===-1?'en':'zh', visible ? 'active' : '']">
+      <div class="ec-panel-ghost" @click="show"></div>
+      <div class="ec-panel-box">
+        <div class="ec-wrap">
+          <canvas
+                  class="ec-canvas"
+                  width="260"
+                  height="160"
+                  id="ec-canvas-bg"
+          ></canvas>
+          <img :src="src1" width="50" height="50" class="ec-image-thumb"/>
+          <!--        <canvas-->
+          <!--          class="ec-canvas-2"-->
+          <!--          width="260"-->
+          <!--          height="160"-->
+          <!--          id="ec-canvas-thumb"-->
+          <!--        ></canvas>-->
+          <div :class="['img-loading', refreshing ? 'active' : '']"></div>
+          <div class="ec-error-tips">{{errormsg}}</div>
+        </div>
+        <div class="ec-panel">
+          <input
+                  value="0"
+                  id="range-input"
+                  class="ec-range"
+                  type="range"
+                  min="0"
+                  max="209"
+          />
+          <div :class="['tip-show', tipShow?'active':'']"></div>
+        </div>
+        <div class="ec-panel-footer">
+          <div class="ec-icon-close" @click="show"></div>
+          <div class="ec-icon-refresh" @click="onRefresh"></div>
+        </div>
       </div>
     </div>
   </div>
@@ -110,20 +112,21 @@ export default {
   },
   mounted() {
     const self = this;
+    this.shadowDomInit();
     this.t = setInterval(() => {
-      if (document.querySelector('#range-input:active')) {
-        const val = document.getElementById('range-input').value;
+      if (document.querySelector('.shadow-dom').shadowRoot.querySelector('#range-input:active')) {
+        const val = document.querySelector('.shadow-dom').shadowRoot.getElementById('range-input').value;
         if (val !== 0) {
           self.tipShow = false;
         }
         self.drawThumb(val);
       }
     }, 20);
-    document.getElementById('range-input').addEventListener('touchmove', () => {
+    document.querySelector('.shadow-dom').shadowRoot.getElementById('range-input').addEventListener('touchmove', () => {
       this.tipShow = false;
-      self.drawThumb(document.getElementById('range-input').value);
+      self.drawThumb(document.querySelector('.shadow-dom').shadowRoot.getElementById('range-input').value);
     });
-    document.querySelector('#range-input').addEventListener('change', () => {
+    document.querySelector('.shadow-dom').shadowRoot.querySelector('#range-input').addEventListener('change', () => {
       this.verify().then((req) => {
         if (req.meta.success) {
           self.showSuccess(req.content.data);
@@ -143,13 +146,31 @@ export default {
     onRefresh() {
       this.loadImage();
     },
+    shadowDomInit() {
+      // 创建shadow dom
+      const parentElement = document.querySelector('.shadow-dom');
+      const fragment = document.createDocumentFragment();
+      fragment.appendChild(parentElement.children[0]);
+      const shadowRoot = parentElement.attachShadow({ mode: 'open' });
+      shadowRoot.appendChild(fragment);
+      const sheet = new CSSStyleSheet();
+      // 拷贝样式
+      document.styleSheets.forEach(stylesheet => {
+        stylesheet.cssRules.forEach(rule => {
+          if (rule.selectorText) {
+            sheet.insertRule(rule.cssText)
+          }
+        })
+      });
+      shadowRoot.adoptedStyleSheets = [sheet];
+    },
     showError(msg) {
       this.errormsg = msg;
       this.$nextTick(() => {
-        document.querySelector('.ec-error-tips').classList.add('error');
+        document.querySelector('.shadow-dom').shadowRoot.querySelector('.ec-error-tips').classList.add('error');
       })
       setTimeout(() => {
-        document.querySelector('.ec-error-tips').classList.remove('error');
+        document.querySelector('.shadow-dom').shadowRoot.querySelector('.ec-error-tips').classList.remove('error');
         this.resetRange();
         // this.resetThumb();
       }, 1200);
@@ -158,21 +179,21 @@ export default {
       }, 1350);
     },
     showSuccess(data) {
-      document.querySelector('.ec-wrap').classList.add('success');
+      document.querySelector('.shadow-dom').shadowRoot.querySelector('.ec-wrap').classList.add('success');
       setTimeout(() => {
-        document.querySelector('.ec-wrap').classList.remove('success');
+        document.querySelector('.shadow-dom').shadowRoot.querySelector('.ec-wrap').classList.remove('success');
         this.show();
         this.resetRange();
         this.$emit('onsuccess', data);
       }, 1200);
     },
     resetRange() {
-      if (!document.getElementById('range-input')) {
+      if (!document.querySelector('.shadow-dom').shadowRoot.getElementById('range-input')) {
         return;
       }
-      const val = document.getElementById('range-input').value;
+      const val = document.querySelector('.shadow-dom').shadowRoot.getElementById('range-input').value;
       if (parseInt(val, 10) > 0) {
-        document.getElementById('range-input').value = parseInt(val, 10) - 6;
+        document.querySelector('.shadow-dom').shadowRoot.getElementById('range-input').value = parseInt(val, 10) - 6;
         requestAnimationFrame(this.resetRange);
       } else {
         this.tipShow = true;
@@ -182,7 +203,7 @@ export default {
       this.visible = false;
     },
     resetThumb() {
-      const canvas = document.getElementById('ec-canvas-thumb');
+      const canvas = document.querySelector('.shadow-dom').shadowRoot.getElementById('ec-canvas-thumb');
       const context = canvas.getContext('2d');
       context.clearRect(0, 0, canvas.width, canvas.height);
       context.drawImage(
@@ -225,7 +246,7 @@ export default {
       const self = this;
       this.refreshing = true;
       img.onload = (e) => {
-        const canvas = document.getElementById('ec-canvas-bg');
+        const canvas = document.querySelector('.shadow-dom').shadowRoot.getElementById('ec-canvas-bg');
         const context = canvas.getContext('2d');
         context.clearRect(0, 0, 260, 160);
         // 图片绘制
@@ -243,7 +264,7 @@ export default {
         imgThumb.src = response.src1;
         this.src1 = imgThumb.src;
         this.src2 = img.src;
-        const style = document.querySelector('.ec-image-thumb').style;
+        const style = document.querySelector('.shadow-dom').shadowRoot.querySelector('.ec-image-thumb').style;
         style.setProperty('--sx', 0);
         style.setProperty('--sy', response.h);
       })
@@ -286,7 +307,7 @@ export default {
     },
     drawThumb(x) {
       this.thumbx = x;
-      document.querySelector('.ec-image-thumb').style.setProperty('--sx', x);
+      document.querySelector('.shadow-dom').shadowRoot.querySelector('.ec-image-thumb').style.setProperty('--sx', x);
     },
   },
   beforeDestroy() {

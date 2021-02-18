@@ -1,6 +1,6 @@
 {
   "name": "rsa-verify",
-  "version": "0.2.3",
+  "version": "0.2.9",
   "description": "在vue中使用的滑块人机校验，附带rsa加密功能，rsa公钥需要作为prop传入",
   "main": "lib/rsa-verify.umd.min.js",
   "directories": {
