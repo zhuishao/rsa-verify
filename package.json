@@ -1,6 +1,6 @@
 {
   "name": "rsa-verify",
-  "version": "0.3.5",
+  "version": "0.3.6",
   "description": "在vue中使用的滑块人机校验，附带rsa加密功能，rsa公钥需要作为prop传入",
   "main": "lib/rsa-verify.umd.min.js",
   "directories": {
@@ -8,7 +8,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "ssh://git@10.43.200.81:22222/e2/rsa-verify.git"
+    "url": "https://github.com/zhuishao/rsa-verify"
   },
   "files": [
     "/lib",
