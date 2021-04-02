@@ -1,5 +1,5 @@
 <template>
-  <div :class="['ec-panel', 'ec-wind', locale.indexOf('zh')===-1?'en':'zh', visible ? 'active' : '']">
+  <div :class="['ec-panel', 'ec-wind', language?'en':'zh', visible ? 'active' : '']">
     <div class="ec-panel-ghost" @click="show"></div>
     <div class="ec-panel-box">
       <div class="ec-wrap">
@@ -87,7 +87,10 @@ export default {
   computed: {
     encodeUrl() {
       return this.url.replace(/\/$/,'');
-    }
+    },
+    language() {
+      return this.locale.toLowerCase().startsWith('en');
+    },
   },
   created() {
     if (!window.requestAnimationFrame) {
